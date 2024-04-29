@@ -97,19 +97,34 @@
 </table>
 
 <script>
+    // Função para carregar os envios anteriores armazenados localmente
+    window.onload = function() {
+        var previousSubmissions = JSON.parse(localStorage.getItem("previousSubmissions")) || [];
+        var previousSubmissionsDiv = document.getElementById("previousSubmissions");
+        previousSubmissions.forEach(function(submission) {
+            var submissionInfo = document.createElement("div");
+            submissionInfo.innerHTML = "<p><strong>Nome:</strong> " + submission.name + "<br><strong>Email:</strong> " + submission.email + "<br><strong>Mensagem:</strong> " + submission.message + "</p><hr>";
+            previousSubmissionsDiv.appendChild(submissionInfo);
+        });
+    };
+
     document.getElementById("contactForm").addEventListener("submit", function(event) {
         event.preventDefault();
         var name = document.getElementById("name").value;
         var email = document.getElementById("email").value;
         var message = document.getElementById("message").value;
-        var previousSubmissions = document.getElementById("previousSubmissions");
+        var previousSubmissions = JSON.parse(localStorage.getItem("previousSubmissions")) || [];
+
+        // Adicionar o envio atual aos envios anteriores
+        previousSubmissions.push({name: name, email: email, message: message});
+        localStorage.setItem("previousSubmissions", JSON.stringify(previousSubmissions));
 
         // Criar um novo elemento para exibir os dados do envio
         var submissionInfo = document.createElement("div");
         submissionInfo.innerHTML = "<p><strong>Nome:</strong> " + name + "<br><strong>Email:</strong> " + email + "<br><strong>Mensagem:</strong> " + message + "</p><hr>";
 
         // Adicionar o novo elemento à seção de envios anteriores
-        previousSubmissions.appendChild(submissionInfo);
+        document.getElementById("previousSubmissions").appendChild(submissionInfo);
 
         // Limpar o formulário após o envio
         document.getElementById("contactForm").reset();
