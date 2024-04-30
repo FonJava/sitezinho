@@ -1,135 +1,75 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>UNES - Página principal</title>
     <meta charset="utf-8">
-    <style>
-        body {
-            background-image: url("imagens/fundo2.png");
-        }
-
-        table {
-            border: 0;
-            width: 80%;
-            margin: 0 auto;
-        }
-
-        td img {
-            display: block;
-            margin: 0 auto;
-        }
-
-        td.links {
-            text-align: right;
-            padding-top: 20px;
-        }
-
-        h2 {
-            text-align: center;
-        }
-
-        form {
-            text-align: center;
-        }
-
-        textarea {
-            width: 100%;
-            height: 100px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #ff6f00;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-
-        footer {
-            text-align: center;
-        }
-
-        #previousSubmissions {
-            text-align: center;
-            margin-top: 20px;
-        }
-    </style>
 </head>
-<body>
 
-<table>
-    <tr>
-        <td><img src="imagens/logo.png"></td>
-        <td class="links">
-            <a href="index.html"><u>Home</u></a> | 
-            <a href="info.html"><u>Quem somos</u></a> | 
-            <a href="contato.html"><u>Contato</u></a>
-        </td>
-    </tr>
+<body background="imagens/fundo2.png">
 
-    <tr>
-        <td colspan="2">
-            <h2>Contato</h2>
-            <p>Entre em contato conosco através do formulário abaixo:</p>
-            <form id="contactForm" action="https://formspree.io/f/mpzvbqre" method="POST">
-                <label for="name">Nome:</label>
-                <input type="text" id="name" name="name" required>
-                
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-                
-                <label for="message">Mensagem:</label>
-                <textarea id="message" name="message" required></textarea>
-                
-                <button type="submit">Enviar</button>
-            </form>
+    <table border="0" width="80%" align="center">
 
-            <div id="previousSubmissions">
-                <h3>Envios Anteriores</h3>
-                <!-- Aqui serão exibidos os envios anteriores -->
-            </div>
+        <tr>
+            <td><img src="imagens/logo.png"></td>
+            <td align="right"><a href="index.html"><u>Home</u></a> | <a href="info.html"><u>Quem somos</u></a> | <a href="contato.html"><u>Contato</u></a>
+            </td>
+        </tr>
 
-            <footer>
-                <strong>Todos os direitos reservados</strong>
-            </footer>
-        </td>
-    </tr>
-</table>
+        <tr>
+            <td colspan="2">
+                <h2>Contato</h2>
+                <p>Entre em contato conosco através do formulário abaixo:</p>
+                <form id="contactForm" action="https://formspree.io/f/mpzvbpgr" method="POST">
+                    <label for="name">Nome:</label>
+                    <input type="text" id="name" name="name" required>
 
-<script>
-    // Função para carregar os envios anteriores armazenados localmente
-    window.onload = function() {
-        var previousSubmissions = JSON.parse(localStorage.getItem("previousSubmissions")) || [];
-        var previousSubmissionsDiv = document.getElementById("previousSubmissions");
-        previousSubmissions.forEach(function(submission) {
-            var submissionInfo = document.createElement("div");
-            submissionInfo.innerHTML = "<p><strong>Nome:</strong> " + submission.name + "<br><strong>Email:</strong> " + submission.email + "<br><strong>Mensagem:</strong> " + submission.message + "</p><hr>";
-            previousSubmissionsDiv.appendChild(submissionInfo);
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="message">Mensagem:</label>
+                    <textarea id="message" name="message" required></textarea>
+
+                    <button type="submit">Enviar</button>
+                </form>
+
+                <div id="successMessage" style="text-align: center; display: none;">
+                    <strong>Obrigado! Seu formulário foi enviado com sucesso.</strong>
+                </div>
+            </td>
+        </tr>
+
+    </table>
+
+    <script>
+        // Função para exibir mensagem de sucesso após o envio do formulário
+        document.getElementById("contactForm").addEventListener("submit", function(event) {
+            // Impedir o envio padrão do formulário
+            event.preventDefault();
+
+            // Realizar o envio do formulário usando AJAX
+            var formData = new FormData(this);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", this.action);
+            xhr.setRequestHeader("Accept", "application/json");
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState !== XMLHttpRequest.DONE) return;
+                if (xhr.status === 200) {
+                    // Se o envio for bem-sucedido, exibir a mensagem de sucesso e limpar o formulário
+                    document.getElementById("successMessage").style.display = "block";
+                    document.getElementById("contactForm").reset();
+                } else {
+                    // Se ocorrer um erro no envio, exibir uma mensagem de erro
+                    alert("Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.");
+                }
+            };
+
+            xhr.send(formData);
         });
-    };
-
-    document.getElementById("contactForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-        var name = document.getElementById("name").value;
-        var email = document.getElementById("email").value;
-        var message = document.getElementById("message").value;
-        var previousSubmissions = JSON.parse(localStorage.getItem("previousSubmissions")) || [];
-
-        // Adicionar o envio atual aos envios anteriores
-        previousSubmissions.push({name: name, email: email, message: message});
-        localStorage.setItem("previousSubmissions", JSON.stringify(previousSubmissions));
-
-        // Criar um novo elemento para exibir os dados do envio
-        var submissionInfo = document.createElement("div");
-        submissionInfo.innerHTML = "<p><strong>Nome:</strong> " + name + "<br><strong>Email:</strong> " + email + "<br><strong>Mensagem:</strong> " + message + "</p><hr>";
-
-        // Adicionar o novo elemento à seção de envios anteriores
-        document.getElementById("previousSubmissions").appendChild(submissionInfo);
-
-        // Limpar o formulário após o envio
-        document.getElementById("contactForm").reset();
-    });
-</script>
+    </script>
 
 </body>
+
 </html>
